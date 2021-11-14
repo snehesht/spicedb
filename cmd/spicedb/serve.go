@@ -13,7 +13,7 @@ import (
 
 	"github.com/alecthomas/units"
 	"github.com/fatih/color"
-	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
+	// grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	grpczerolog "github.com/grpc-ecosystem/go-grpc-middleware/providers/zerolog/v2"
 	grpclog "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	grpcprom "github.com/grpc-ecosystem/go-grpc-prometheus"
@@ -23,7 +23,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 
-	"github.com/authzed/spicedb/internal/auth"
+	// "github.com/authzed/spicedb/internal/auth"
 	"github.com/authzed/spicedb/internal/dashboard"
 	"github.com/authzed/spicedb/internal/datastore"
 	"github.com/authzed/spicedb/internal/datastore/common"
@@ -250,10 +250,12 @@ func serveRun(cmd *cobra.Command, args []string) {
 		[]float64{.006, .010, .018, .024, .032, .042, .056, .075, .100, .178, .316, .562, 1.000},
 	))
 
+	// Disabled PreSharedKey Auth till the bug with authzed-node is fixed
+	// PreSharedKey is not passed correctly with authzed-node
 	middleware := grpc.ChainUnaryInterceptor(
 		grpclog.UnaryServerInterceptor(grpczerolog.InterceptorLogger(log.Logger)),
 		otelgrpc.UnaryServerInterceptor(),
-		grpcauth.UnaryServerInterceptor(auth.RequirePresharedKey(token)),
+		// grpcauth.UnaryServerInterceptor(auth.RequirePresharedKey(token)),
 		grpcprom.UnaryServerInterceptor,
 		servicespecific.UnaryServerInterceptor,
 	)
@@ -261,7 +263,7 @@ func serveRun(cmd *cobra.Command, args []string) {
 	streamMiddleware := grpc.ChainStreamInterceptor(
 		grpclog.StreamServerInterceptor(grpczerolog.InterceptorLogger(log.Logger)),
 		otelgrpc.StreamServerInterceptor(),
-		grpcauth.StreamServerInterceptor(auth.RequirePresharedKey(token)),
+		// grpcauth.StreamServerInterceptor(auth.RequirePresharedKey(token)),
 		grpcprom.StreamServerInterceptor,
 		servicespecific.StreamServerInterceptor,
 	)
